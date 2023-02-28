@@ -68,4 +68,65 @@ usersRouter.put("/:id", (req, res) => {
     });
 });
 
+usersRouter.delete("/:id", (req, res) => {
+  const id = req.params.id;
+  pool
+    .query("DELETE FROM users WHERE id=$id RETURNING *;", [id])
+    .then((data) => {
+      res.status(201).json(data.rows[0]);
+    })
+    .catch((e) => {
+      res.status(500).json({ message: e.message });
+    });
+});
+
+// gets all orders linked to a specific user
+usersRouter.get("/:id/orders", (req, res) => {
+  const id = req.params.id;
+  pool
+    .query(
+      "SELECT orders.id as order_no, * FROM orders JOIN users ON users.id=user_id WHERE users.id = $1;",
+      [id]
+    )
+    .then((data) => {
+      if (data.rowCount === 0) {
+        res.status(404).json({ message: "This user has no orders" });
+      } else {
+        res.json(data.rows);
+      }
+    })
+    .catch((e) => {
+      res.status(500).json({
+        message: "An error occured while fetching orders of this user.",
+      });
+    });
+});
+
+// if a user has never ordered, they should be set as inactive
+usersRouter.put("/:id/check-inactive", (req, res) => {
+  const id = req.params.id;
+  console.log(req.params.id);
+  const { first_name, last_name, age, active } = req.body;
+
+  // if rows of orders are length 0 -> set user inactive
+  pool
+    .query(
+      "select * from orders join users on users.id=user_id where users.id=$1",
+      [id]
+    )
+    .then((data) => {
+      if (data.rowCount === 0) {
+        console.log("This should be inactive");
+        //res.status(404).json({ message: "This user has no orders" });
+      } else {
+        console.log("This should NOT be inactive");
+
+        res.json(data.rows);
+      }
+    })
+    .catch((e) => {
+      res.status(500).json({ message: e.message });
+    });
+});
+
 module.exports = usersRouter;

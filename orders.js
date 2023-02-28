@@ -66,4 +66,16 @@ ordersRouter.put("/:id", (req, res) => {
     });
 });
 
+ordersRouter.delete("/:id", (req, res) => {
+  const id = req.params.id;
+  pool
+    .query("DELETE FROM orders WHERE id=$id RETURNING *;", [id])
+    .then((data) => {
+      res.status(201).json(data.rows[0]);
+    })
+    .catch((e) => {
+      res.status(500).json({ message: e.message });
+    });
+});
+
 module.exports = ordersRouter;
