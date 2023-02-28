@@ -1,1 +1,1 @@
-# nodejs-exercise
+small RESTful API using Node + Express + a PostgreSQL
