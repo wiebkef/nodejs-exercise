@@ -37,4 +37,19 @@ usersRouter.get("/:id", (req, res) => {
     });
 });
 
+usersRouter.post("/", (req, res) => {
+  const { first_name, last_name, age, active } = req.body;
+  pool
+    .query(
+      "INSERT INTO users (first_name, last_name, age, active) VALUES ($1, $2, $3) RETURNING *;",
+      [first_name, last_name, age, active]
+    )
+    .then((data) => {
+      res.status(201).json(data.rows[0]);
+    })
+    .catch((e) => {
+      res.status(500).json({ message: e.message });
+    });
+});
+
 module.exports = usersRouter;

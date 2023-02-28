@@ -35,4 +35,19 @@ ordersRouter.get("/:id", (req, res) => {
     });
 });
 
+ordersRouter.post("/", (req, res) => {
+  const { price, date, user_id } = req.body;
+  pool
+    .query(
+      "INSERT INTO orders (price, date, user_id ) VALUES ($1, $2, $3) RETURNING *;",
+      [price, date, user_id]
+    )
+    .then((data) => {
+      res.status(201).json(data.rows[0]);
+    })
+    .catch((e) => {
+      res.status(500).json({ message: e.message });
+    });
+});
+
 module.exports = ordersRouter;
