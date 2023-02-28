@@ -50,4 +50,20 @@ ordersRouter.post("/", (req, res) => {
     });
 });
 
+ordersRouter.put("/:id", (req, res) => {
+  const id = req.params.id;
+  const { price, date, user_id } = req.body;
+  pool
+    .query(
+      "UPDATE orders SET price=$1, date=$2, user_id=$3 WHERE id=$id RETURNING *;",
+      [price, date, user_id, id]
+    )
+    .then((data) => {
+      res.status(201).json(data.rows[0]);
+    })
+    .catch((e) => {
+      res.status(500).json({ message: e.message });
+    });
+});
+
 module.exports = ordersRouter;

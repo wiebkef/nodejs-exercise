@@ -41,8 +41,24 @@ usersRouter.post("/", (req, res) => {
   const { first_name, last_name, age, active } = req.body;
   pool
     .query(
-      "INSERT INTO users (first_name, last_name, age, active) VALUES ($1, $2, $3) RETURNING *;",
+      "INSERT INTO users (first_name, last_name, age, active) VALUES ($1, $2, $3, $4) RETURNING *;",
       [first_name, last_name, age, active]
+    )
+    .then((data) => {
+      res.status(201).json(data.rows[0]);
+    })
+    .catch((e) => {
+      res.status(500).json({ message: e.message });
+    });
+});
+
+usersRouter.put("/:id", (req, res) => {
+  const id = req.params.id;
+  const { first_name, last_name, age, active } = req.body;
+  pool
+    .query(
+      "UPDATE users SET first_name=$1, last_name=$2, age=$3, active=$4 WHERE id=$id RETURNING *;",
+      [first_name, last_name, age, active, id]
     )
     .then((data) => {
       res.status(201).json(data.rows[0]);
