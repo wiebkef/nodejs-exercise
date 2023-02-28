@@ -15,9 +15,9 @@ app.use(cors());
 
 /* const usersRouter = require("./users.js");
 app.use("/users", usersRouter);
-
+*/
 const ordersRouter = require("./orders.js");
-app.use("/orders", ordersRouter); */
+app.use("/orders", ordersRouter);
 
 app.get("/", (req, res, next) => {
   res.send("Such a beautiful online shop simulation.");
