@@ -55,7 +55,7 @@ ordersRouter.put("/:id", (req, res) => {
   const { price, date, user_id } = req.body;
   pool
     .query(
-      "UPDATE orders SET price=$1, date=$2, user_id=$3 WHERE id=$id RETURNING *;",
+      "UPDATE orders SET price=$1, date=$2, user_id=$3 WHERE id=$4 RETURNING *;",
       [price, date, user_id, id]
     )
     .then((data) => {
@@ -69,7 +69,7 @@ ordersRouter.put("/:id", (req, res) => {
 ordersRouter.delete("/:id", (req, res) => {
   const id = req.params.id;
   pool
-    .query("DELETE FROM orders WHERE id=$id RETURNING *;", [id])
+    .query("DELETE FROM orders WHERE id=$1 RETURNING *;", [id])
     .then((data) => {
       res.status(201).json(data.rows[0]);
     })

@@ -57,7 +57,7 @@ usersRouter.put("/:id", (req, res) => {
   const { first_name, last_name, age, active } = req.body;
   pool
     .query(
-      "UPDATE users SET first_name=$1, last_name=$2, age=$3, active=$4 WHERE id=$id RETURNING *;",
+      "UPDATE users SET first_name=$1, last_name=$2, age=$3, active=$4 WHERE id=$5 RETURNING *;",
       [first_name, last_name, age, active, id]
     )
     .then((data) => {
@@ -71,7 +71,7 @@ usersRouter.put("/:id", (req, res) => {
 usersRouter.delete("/:id", (req, res) => {
   const id = req.params.id;
   pool
-    .query("DELETE FROM users WHERE id=$id RETURNING *;", [id])
+    .query("DELETE FROM users WHERE id=$1 RETURNING *;", [id])
     .then((data) => {
       res.status(201).json(data.rows[0]);
     })
@@ -80,7 +80,7 @@ usersRouter.delete("/:id", (req, res) => {
     });
 });
 
-// gets all orders linked to a specific user
+// gets all orders from one user
 usersRouter.get("/:id/orders", (req, res) => {
   const id = req.params.id;
   pool
@@ -105,10 +105,8 @@ usersRouter.get("/:id/orders", (req, res) => {
 // if a user has never ordered, they should be set as inactive
 usersRouter.put("/:id/check-inactive", (req, res) => {
   const id = req.params.id;
-  console.log(req.params.id);
-  const { first_name, last_name, age, active } = req.body;
+  const { first_name, last_name, age } = req.body;
 
-  // if rows of orders are length 0 -> set user inactive
   pool
     .query(
       "select * from orders join users on users.id=user_id where users.id=$1",
@@ -116,12 +114,13 @@ usersRouter.put("/:id/check-inactive", (req, res) => {
     )
     .then((data) => {
       if (data.rowCount === 0) {
-        console.log("This should be inactive");
-        //res.status(404).json({ message: "This user has no orders" });
+        pool.query(
+          "UPDATE users SET first_name=$1, last_name=$2, age=$3, active=false WHERE id=$4 RETURNING *;",
+          [first_name, last_name, age, id]
+        );
+        res.status(200).json(data.rows[0]);
       } else {
-        console.log("This should NOT be inactive");
-
-        res.json(data.rows);
+        res.json(data.rows[0]);
       }
     })
     .catch((e) => {

@@ -1,1 +1,1 @@
-small RESTful API using Node + Express + a PostgreSQL
+small RESTful API using Node + Express + PostgreSQL

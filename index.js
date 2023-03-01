@@ -3,9 +3,7 @@ require("dotenv/config");
 const app = express();
 const PORT = process.env.PORT || 4001;
 const { Pool } = require("pg");
-const pool = new Pool({
-  connectionString: process.env.ELEPHANT_SQL_CONNECTION_STRING,
-});
+
 const cors = require("cors");
 
 //const pool = require("./poolConnection.js");
